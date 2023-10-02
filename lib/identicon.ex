@@ -3,7 +3,15 @@ defmodule Identicon do
   Documentation for `Identicon`.
   """
 
-  def main(input) do
+  def main(args) when length(args) != 1, do: raise(ArgumentError, "Usage: indenticon WORD")
+
+  def main(args) do
+    input = to_string(hd(args))
+
+    if input == "" do
+      raise ArgumentError, "Usage: indenticon TEXT"
+    end
+
     input
     |> hash_input
     |> pick_color
@@ -45,7 +53,7 @@ defmodule Identicon do
   defp slugify(input) do
     input
     |> String.downcase()
-    |> String.trim
+    |> String.trim()
     |> String.normalize(:nfd)
     |> String.replace(~r/[^a-z0-9\s-]/u, "")
     |> String.replace(~r/[\s-]+/, "-", global: true)
