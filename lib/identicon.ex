@@ -13,17 +13,18 @@ defmodule Identicon do
     |> save_image(input)
   end
 
-  defp build_pixel_map(%Identicon.Image{ grid: grid } = image) do
-    pixel_map = Enum.map(grid, fn { _, index } ->
-      h_dist = rem(index, 5) * 50
-      v_dist = div(index, 5) * 50
+  defp build_pixel_map(%Identicon.Image{grid: grid} = image) do
+    pixel_map =
+      Enum.map(grid, fn {_, index} ->
+        h_dist = rem(index, 5) * 50
+        v_dist = div(index, 5) * 50
 
-      top_l = { h_dist, v_dist }
-      bottom_r = { h_dist + 50, v_dist + 50 }
-      { top_l, bottom_r }
-    end)
+        top_l = {h_dist, v_dist}
+        bottom_r = {h_dist + 50, v_dist + 50}
+        {top_l, bottom_r}
+      end)
 
-    %Identicon.Image{ image | pixel_map: pixel_map }
+    %Identicon.Image{image | pixel_map: pixel_map}
   end
 
   defp draw_image(%Identicon.Image{color: color, pixel_map: pixel_map}) do
@@ -38,7 +39,16 @@ defmodule Identicon do
   end
 
   defp save_image(image, input) do
-    File.write("#{input}.png", image)
+    File.write("#{slugify(input)}.png", image)
+  end
+
+  defp slugify(input) do
+    input
+    |> String.downcase()
+    |> String.trim
+    |> String.normalize(:nfd)
+    |> String.replace(~r/[^a-z0-9\s-]/u, "")
+    |> String.replace(~r/[\s-]+/, "-", global: true)
   end
 
   defp build_grid(%Identicon.Image{hex: hex} = image) do
@@ -47,8 +57,8 @@ defmodule Identicon do
       |> Enum.chunk_every(3)
       |> Enum.take(5)
       |> Enum.map(&mirror/1)
-      |> List.flatten
-      |> Enum.with_index
+      |> List.flatten()
+      |> Enum.with_index()
       |> filter_odd_squares
 
     %Identicon.Image{image | grid: grid}
