@@ -3,14 +3,12 @@ defmodule Identicon do
   Documentation for `Identicon`.
   """
 
-  def main(args) when length(args) != 1, do: raise(ArgumentError, "Usage: indenticon WORD")
+  def main(args) when length(args) != 1, do: raise(ArgumentError, "Usage: identicon WORD")
 
-  def main(args) do
-    input = to_string(hd(args))
+  def main([word]) do
+    input = to_string(word)
 
-    if input == "" do
-      raise ArgumentError, "Usage: indenticon TEXT"
-    end
+    if input == "", do: raise(ArgumentError, "Usage: identicon WORD")
 
     input
     |> hash_input
